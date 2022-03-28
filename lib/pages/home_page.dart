@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,15 +13,42 @@ class _HomePageState extends State<HomePage> {
   TextEditingController pesoController = TextEditingController();
   TextEditingController alturaController = TextEditingController();
 
+  var mask = new MaskTextInputFormatter(mask: '#.##');
+
   String? errorTextPeso;
   String? errorTextAltura;
-  String? resultado;
+  String resultado = '';
 
   void reset(){
     setState(() {
       pesoController.clear();
       alturaController.clear();
+      errorTextAltura = null;
+      errorTextPeso =null;
+      resultado = '';
     });
+  }
+
+  bool verificaAltura(){
+    if(alturaController == null){
+      errorTextAltura = 'Campo Obrigatório';
+      return false;
+    }
+    return true;
+  }
+
+  bool verificaPeso(){
+    if(pesoController == null){
+      setState(() {
+        errorTextPeso = 'Campo obrigatório';
+      });
+      return false;
+    }
+    return true;
+  }
+
+  String calculaImc(double peso, double altura){
+    return (double.parse(pesoController.text) / (double.parse(alturaController.text) * double.parse(alturaController.text))).toStringAsPrecision(4);
   }
 
   @override
@@ -33,7 +61,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             onPressed: (){ reset(); },
-            icon: const Icon(Icons.restart_alt),
+            icon: const Icon(Icons.refresh),
             tooltip: 'Redefinir Campos',
           ),
         ],
@@ -43,6 +71,15 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.person_outline,
+                  size: 120,
+                  color: Colors.amber,
+                ),
+              ],
+            ),
             TextField(
               controller: pesoController,
               keyboardType: TextInputType.number,
@@ -51,7 +88,7 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.amber,
                 fontSize: 23,
               ),
-              decoration: InputDecoration(
+              decoration:  InputDecoration(
                   errorText: errorTextPeso,
                   enabledBorder: const UnderlineInputBorder(
                       borderSide: BorderSide(
@@ -81,6 +118,7 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 20,),
             TextField(
+              inputFormatters: [mask],
               controller: alturaController,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
@@ -126,7 +164,14 @@ class _HomePageState extends State<HomePage> {
                       style: ElevatedButton.styleFrom(
                         primary: Colors.amber,
                       ),
-                      onPressed: (){},
+                      onPressed: (){
+                        if(verificaPeso() && verificaAltura()){
+                          setState(() {
+                            resultado = calculaImc(double.parse(pesoController.text), double.parse(alturaController.text));
+                          });
+                        }
+                        return;
+                      },
                       child: const Padding(
                         padding:  EdgeInsets.all(10),
                         child:  Text('Calcular',
@@ -145,9 +190,9 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text('Resultado',
-                    style: TextStyle(
+                children: [
+                  Text('Resultado: $resultado',
+                    style: const TextStyle(
                       color: Colors.amber,
                       fontSize: 23,
                     ),
