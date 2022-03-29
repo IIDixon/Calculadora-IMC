@@ -18,6 +18,7 @@ class _HomePageState extends State<HomePage> {
   String? errorTextPeso;
   String? errorTextAltura;
   String resultado = '';
+  String nivel = '';
 
   void reset(){
     setState(() {
@@ -26,6 +27,7 @@ class _HomePageState extends State<HomePage> {
       errorTextAltura = null;
       errorTextPeso =null;
       resultado = '';
+      nivel = '';
     });
   }
 
@@ -49,6 +51,28 @@ class _HomePageState extends State<HomePage> {
 
   String calculaImc(double peso, double altura){
     return (double.parse(pesoController.text) / (double.parse(alturaController.text) * double.parse(alturaController.text))).toStringAsPrecision(4);
+  }
+
+  String calculaNivelImc(double imc){
+    if(imc < 16){
+      return 'Magreza grave';
+    }else if(imc > 16 && imc < 17){
+      return 'Magreza moderada';
+    } else if(imc > 17 && imc < 18.5){
+      return 'Magreza leve';
+    } else if(imc > 18.5 && imc < 25){
+      return 'Saudável';
+    } else if(imc > 25 && imc < 30){
+      return 'Sobrepeso';
+    } else if(imc > 30 && imc < 35){
+      return 'Obesidade Grau I';
+    } else if(imc > 35 && imc < 40){
+      return 'Obesidade Grau II (Severa)';
+    } else if (imc >= 40){
+      return 'Obesidade Grau III (Mórbida)';
+    } else{
+      return 'Não foi possível realizar o cálculo';
+    }
   }
 
   @override
@@ -168,6 +192,7 @@ class _HomePageState extends State<HomePage> {
                         if(verificaPeso() && verificaAltura()){
                           setState(() {
                             resultado = calculaImc(double.parse(pesoController.text), double.parse(alturaController.text));
+                            nivel = calculaNivelImc(double.parse(resultado));
                           });
                         }
                         return;
@@ -191,7 +216,7 @@ class _HomePageState extends State<HomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Resultado: $resultado',
+                  Text('Resultado: $resultado - $nivel',
                     style: const TextStyle(
                       color: Colors.amber,
                       fontSize: 23,
@@ -199,7 +224,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
