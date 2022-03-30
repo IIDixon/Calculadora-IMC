@@ -13,7 +13,7 @@ class _HomePageState extends State<HomePage> {
   TextEditingController pesoController = TextEditingController();
   TextEditingController alturaController = TextEditingController();
 
-  var mask = new MaskTextInputFormatter(mask: '#.##');
+  var mask = MaskTextInputFormatter(mask: '#.##');
 
   String? errorTextPeso;
   String? errorTextAltura;
@@ -32,20 +32,24 @@ class _HomePageState extends State<HomePage> {
   }
 
   bool verificaAltura(){
-    if(alturaController == null){
-      errorTextAltura = 'Campo Obrigatório';
+    if(alturaController.text.isEmpty){
+      setState(() {
+        errorTextAltura= 'Campo Obrigatório';
+      });
       return false;
     }
+    errorTextAltura = null;
     return true;
   }
 
   bool verificaPeso(){
-    if(pesoController == null){
+    if(pesoController.text.isEmpty){
       setState(() {
         errorTextPeso = 'Campo obrigatório';
       });
       return false;
     }
+    errorTextPeso = null;
     return true;
   }
 
@@ -54,22 +58,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   String calculaNivelImc(double imc){
+
     if(imc < 16){
-      return 'Magreza grave';
+      return 'Magreza grave (${imc.toStringAsPrecision(4)})';
     }else if(imc > 16 && imc < 17){
-      return 'Magreza moderada';
+      return 'Magreza moderada (${imc.toStringAsPrecision(4)})';
     } else if(imc > 17 && imc < 18.5){
-      return 'Magreza leve';
+      return 'Magreza leve (${imc.toStringAsPrecision(4)})';
     } else if(imc > 18.5 && imc < 25){
-      return 'Saudável';
+      return 'Saudável (${imc.toStringAsPrecision(4)})';
     } else if(imc > 25 && imc < 30){
-      return 'Sobrepeso';
+      return 'Sobrepeso (${imc.toStringAsPrecision(4)})';
     } else if(imc > 30 && imc < 35){
-      return 'Obesidade Grau I';
+      return 'Obesidade Grau I (${imc.toStringAsPrecision(4)})';
     } else if(imc > 35 && imc < 40){
-      return 'Obesidade Grau II (Severa)';
+      return 'Obesidade Grau II (Severa) (${imc.toStringAsPrecision(4)})';
     } else if (imc >= 40){
-      return 'Obesidade Grau III (Mórbida)';
+      return 'Obesidade Grau III (Mórbida) (${imc.toStringAsPrecision(4)})';
     } else{
       return 'Não foi possível realizar o cálculo';
     }
@@ -212,12 +217,12 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.only(top: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Resultado: $resultado - $nivel',
-                    style: const TextStyle(
+                children: const [
+                  Text('Resultado:',
+                    style: TextStyle(
                       color: Colors.amber,
                       fontSize: 23,
                     ),
@@ -225,6 +230,20 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(nivel,
+                    style: const TextStyle(
+                      color: Colors.amber,
+                      fontSize: 23,
+                    ),
+                  )
+                ],
+              ),
+            )
           ],
         ),
       ),
